@@ -1,9 +1,5 @@
 FROM ubuntu:16.04
 
-ENV ETHMINER_GIT_URL=https://github.com/ethereum-mining/ethminer
-ENV ETHMINER_VERSION=0.13.0.dev0
-ENV CUDA_TOOLKIT_URL=https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run
-
 RUN \
   sed -i 's/# \(.*multiverse$\)/\1/g' /etc/apt/sources.list && \
   apt-get update && \
@@ -12,6 +8,8 @@ RUN \
   update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 40 --slave /usr/bin/g++ g++ /usr/bin/g++-4.8 && \
   rm -rf /var/lib/apt/lists/* && \
   mkdir /build
+
+ARG CUDA_TOOLKIT_URL=https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run
 
 RUN \
   cd /build && \
@@ -22,17 +20,22 @@ RUN \
   sh ./$(basename "$CUDA_TOOLKIT_URL") --silent --toolkit --no-drm && \
   rm ./$(basename "$CUDA_TOOLKIT_URL")
 
-ENV ETHMINER_GIT_BRANCH=master
+ARG ETHMINER_GIT_URL=https://github.com/ethereum-mining/ethminer
+ARG ETHMINER_GIT_BRANCH=master
+ARG ETHMINER_GIT_TAG=v0.16.0.dev2
 
 RUN \
   cd /build && \
-  git clone ${ETHMINER_GIT_URL} && \
+  rm -rf ethminer && \
+  git clone ${ETHMINER_GIT_URL} --depth=1 && \
   cd ./ethminer && \
-  git checkout ${ETHMINER_GIT_BRANCH} && \
+  git checkout tags/${ETHMINER_GIT_TAG} && \
+  git submodule init && \
+  git submodule update && \
   mkdir ./build
 
 RUN \
   cd /build/ethminer/build && \
-  cmake -DETHASHCUDA=ON -DETHASHCUDA=ON -DETHSTRATUM=ON .. && \
+  cmake -DETHASHCL=ON -DETHASHCUDA=ON -DETHSTRATUM=ON .. && \
   cmake --build .
 
