@@ -1,6 +1,4 @@
 FROM ubuntu:16.04
-ENV ETHMINER_GIT_URL=https://github.com/ethereum-mining/ethminer
-ENV ETHMINER_VERSION=0.14.0.dev2
 ENV CUDA_TOOLKIT_URL=https://developer.nvidia.com/compute/cuda/9.1/Prod/local_installers/cuda_9.1.85_387.26_linux
 ENV CUDA_TOOLKIT_PATCHURL=https://developer.nvidia.com/compute/cuda/9.1/Prod/patches/1/cuda_9.1.85.1_linux
 #https://developer.nvidia.com/compute/cuda/9.1/Prod/local_installers/cuda_9.1.85_387.26_linux-run
@@ -27,14 +25,17 @@ RUN \
   sh ./$(basename "$CUDA_TOOLKIT_PATCHURL") --silent --accept-eula && \
   rm ./$(basename "$CUDA_TOOLKIT_PATCHURL")
 
-ENV ETHMINER_GIT_BRANCH=master
-#ENV ETHMINER_GIT_BRANCH=release/0.13
+ARG ETHMINER_GIT_URL=https://github.com/ethereum-mining/ethminer
+ARG ETHMINER_GIT_BRANCH=master
+ARG ETHMINER_GIT_TAG=v0.16.0.dev2
 
 RUN \
   cd /build && \
-  git clone ${ETHMINER_GIT_URL} && \
+  rm -rf ethminer && \
+  git clone ${ETHMINER_GIT_URL} --depth=1 && \
   cd ./ethminer && \
-  git checkout ${ETHMINER_GIT_BRANCH} && \
+  git checkout tags/${ETHMINER_GIT_TAG} && \
+  git submodule init && git submodule update && \
   mkdir ./build
 
 RUN \
