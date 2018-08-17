@@ -23,21 +23,20 @@ RUN \
   sh ./$(basename "$CUDA_TOOLKIT_PATCHURL") --silent --accept-eula && \
   rm ./$(basename "$CUDA_TOOLKIT_PATCHURL")
 
-ARG ETHMINER_GIT_URL=https://github.com/ethereum-mining/ethminer
+ARG ETHMINER_GIT_URL=https://github.com/ifdefelse/ProgPOW.git
 ARG ETHMINER_GIT_BRANCH=master
-ARG ETHMINER_GIT_TAG=v0.16.0.dev2
+ARG ETHMINER_GIT_TAG=v0.15.0.progpow
 
 RUN \
   cd /build && \
-  rm -rf ethminer && \
-  git clone ${ETHMINER_GIT_URL} --depth=1 && \
-  cd ./ethminer && \
-  git checkout tags/${ETHMINER_GIT_TAG} && \
-  git submodule init && git submodule update && \
+  git clone ${ETHMINER_GIT_URL} --recursive && \
+  cd ./ProgPOW && \
+#  git checkout tags/${ETHMINER_GIT_TAG} && \
+#  git submodule init && git submodule update && \
   mkdir ./build
 
 RUN \
-  cd /build/ethminer/build && \
-  cmake -DETHASHCUDA=ON -DETHSTRATUM=ON .. && \
+  cd /build/ProgPOW/build && \
+  cmake -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs -DETHASHCUDA=ON -DETHSTRATUM=ON .. && \
   cmake --build .
 
