@@ -37,6 +37,8 @@ RUN \
 
 RUN \
   cd /build/ProgPOW/build && \
-  cmake -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs -DETHASHCL=ON -DETHASHCUDA=ON -DETHSTRATUM=ON .. && \
+  cmake -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs -DETHASHCL=OFF -DETHASHCUDA=ON -DETHSTRATUM=ON .. && \
   cmake --build .
 
+  #Opencl is broken
+  #  cmake -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs -DETHASHCL=ON -DETHASHCUDA=ON -DETHSTRATUM=ON .. && \
